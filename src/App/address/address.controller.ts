@@ -40,7 +40,7 @@ export class AddressController extends BaseController<Address> {
     const user = await this.userRepository.findOne({
       where: { id: currentUser.users.id },
     });
-    body.users = [user];
+    body.user = user;
     const result = this.repository.create(body);
     await this.repository.save(result);
     return result;

@@ -26,14 +26,10 @@ import * as bcrypt from 'bcrypt';
 import { Type } from 'class-transformer';
 import { CrudValidationGroups } from '@nestjsx/crud';
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from '../entity/profile.entity';
 import { Role } from '../entity/role.entity';
-import { Category } from './category.entity';
-import { Tag } from './tag.entity';
+import { Notification } from './notification.entity';
 import { Address } from './address.entity';
-import { Order } from './order.entity';
-import { Comment } from './comment.entity';
-import { Book } from './book.entity';
+import { Profile } from './profile.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 export class Name {
   @IsString({ always: true })
@@ -68,6 +64,12 @@ export class User extends Base {
   @Column(type => Name)
   name: Name;
 
+  @IsOptional({ groups: [UPDATE, CREATE] })
+  @IsString({ always: true })
+  @MaxLength(255, { always: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  introduction: string;
+
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
   @IsString({ always: true })
@@ -100,11 +102,27 @@ export class User extends Base {
   @Column({ type: 'int', default: 3 })
   roleId: number;
 
-  @OneToMany(
-    type => Order,
-    order => order,
+  /** Relation to Role */
+  @ManyToOne(
+    type => Role,
+    role => role.users,
+    { eager: true },
   )
-  orders: Order[];
+  @JoinColumn({ name: 'roleId' })
+  role: Role;
+
+  // Relation to Notification
+  @ManyToMany(
+    type => Notification,
+    notification => notification.users
+  )
+  @JoinTable({
+    name: 'user_notify',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id'},
+    inverseJoinColumn: { name: 'notify_id', referencedColumnName: 'id'},
+  })
+  notifications: Notification[];
+
   /** Relation to Profile */
   @IsOptional({ groups: [UPDATE, CREATE] })
   @ValidateNested({ always: true })
@@ -117,72 +135,9 @@ export class User extends Base {
   @JoinColumn()
   profile: Profile;
 
-  /** Relation to Role */
-  @ManyToOne(
-    type => Role,
-    role => role.users,
-    { eager: true },
-  )
-  @JoinColumn({ name: 'roleId' })
-  role: Role;
-
-  @OneToMany(
-    type => Tag,
-    Tag => Tag.author,
-  )
-  tags: Tag[];
-
-  @OneToMany(
-    type => Category,
-    category => category.user,
-  )
-  categories: Category[];
-
-  /**
-   * Relation User to Address
-   */
-  @ManyToMany(
+  @OneToOne(
     type => Address,
-    adress => adress.users,
+    address => address.user,
   )
-  @JoinTable({
-    joinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'addressId',
-      referencedColumnName: 'id',
-    },
-  })
-  addresses: Address[];
-
-  @OneToMany(
-    type => Comment,
-    comment => comment.author,
-  )
-  comments: Comment[];
-
-  @ManyToMany(
-    type => Book,
-    book => book.favoritesBy,
-  )
-  favorites: Book[];
-
-  @ManyToMany(
-    type => Book,
-    book => book.items,
-  )
-  @JoinTable()
-  recentView: Book[];
-  @BeforeInsert()
-  async hashPassword() {
-    const saltRounds = 12;
-    this.password = await bcrypt.hash(this.password, saltRounds);
-  }
-
-  // private get token() {
-  //   const { id, username } = this;
-  //   return jwt.sign({ id, username }, process.env.SECRET, { expiresIn: '7d' });
-  // }
+  address: Address;
 }

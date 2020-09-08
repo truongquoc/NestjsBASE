@@ -8,7 +8,6 @@ import { PermissionsEntity } from 'src/entity/permission.entity';
 import { JWTStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { CategoriesModule } from '../categories/categories.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role, PermissionsEntity]),

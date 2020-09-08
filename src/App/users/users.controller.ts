@@ -48,8 +48,8 @@ import { ModuleEnum } from 'src/common/enums/module.enum';
       type: 'uuid',
       primary: true,
     },
-    username: {
-      field: 'username',
+    name: {
+      field: 'name',
       type: 'string',
       primary: true,
     },
@@ -152,7 +152,7 @@ export class UserController extends BaseController<User> {
   })
   async createOne(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: User) {
     try {
-      console.log('here');
+      console.log('herasdase');
       const data = await this.base.createOneBase(req, dto);
       return data;
     } catch (error) {
