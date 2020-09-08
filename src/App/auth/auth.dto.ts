@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsBoolean,
   IsDateString,
+  MinLength,
 } from 'class-validator';
 import { Match } from 'src/Helper/validation/match.decorator';
 import { CrudValidationGroups } from '@nestjsx/crud';
@@ -30,6 +31,7 @@ export class LoginDTO {
 }
 export class RegisterDTO {
   @ApiProperty({
+    example: 'admin@gmail.com',
     type: String,
     description: 'Email',
     required: true,
@@ -37,7 +39,15 @@ export class RegisterDTO {
   @IsNotEmpty({ groups: [CREATE] })
   email: string;
 
-  @IsString()
+  @ApiProperty({
+    example: 'admin',
+    description: 'Password required at least 5 letters',
+  })
+  @MinLength(5, {
+    always: true,
+    message: 'Password requires at least 5 letters',
+  })
+  @IsString({ always: true })
   @IsNotEmpty({ groups: [CREATE] })
   @ApiProperty({ type: String, description: 'password', required: true })
   password: string;
@@ -52,21 +62,18 @@ export class RegisterDTO {
   confirmPassword: string;
 
   @IsString()
-  @ApiProperty({ type: String, description: 'FirstName' })
-  firstName: string;
+  @ApiProperty({ type: String, description: 'Name' })
+  name: string;
 
-  @IsString()
-  @ApiProperty({ type: String, description: 'LastName', required: true })
+  @ApiProperty({
+    example: 'MALE',
+    type: String,
+    description: 'Gender',
+    required: true,
+  })
   @IsNotEmpty({ groups: [CREATE] })
-  lastName: string;
-
-  @IsBoolean()
-  @ApiProperty({ type: Boolean, description: 'Gender', required: true })
-  @IsNotEmpty({ groups: [CREATE] })
-  gender: boolean;
-
-  @ApiProperty({ type: Date, description: 'Birthday' })
-  birthday: string;
+  @IsString({ always: true })
+  gender: string;
 }
 
 export class ChangePwdDTO {

@@ -1,7 +1,6 @@
 export class Payload {
   id: string;
-  firstName?: string;
-  lastName?: string;
+  name: string;
   role?: string;
   email?: string;
   password?: string;

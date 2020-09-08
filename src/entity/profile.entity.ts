@@ -1,9 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 import { Base } from './base.entity';
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength, IsIn } from 'class-validator';
 import { CrudValidationGroups } from '@nestjsx/crud';
 import { User } from './user.entity';
-import { experienceEnum } from '../common/enums/experience.enum';
+import { Experience } from '../common/enums/experience.enum';
+import { enumToArray } from '../core/utils/helper';
+import { ApiProperty } from '@nestjs/swagger';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('profiles')
@@ -11,36 +13,26 @@ export class Profile extends Base {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @IsOptional({ always: true })
+  @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @MaxLength(32, { always: true })
-  @Column({ type: 'varchar', length: 32, nullable: true, default: null })
-  profile_url: string;
+  @Column({ type: 'text', nullable: true, default: null })
+  profileUrl: string;
 
-  @IsOptional({ always: true })
+  @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @MaxLength(32, { always: true })
-  @Column({ type: 'varchar', length: 32, nullable: true, default: null })
-  page_url: string;
+  @Column({ type: 'text', nullable: true, default: null })
+  pageURL: string;
 
-  @IsOptional({ always: true })
+  @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @MaxLength(32, { always: true })
-  @Column({ type: 'varchar', length: 32, nullable: true, default: null })
-  cv_url: string;
+  @Column({ type: 'text', nullable: true, default: null })
+  cvURL: string;
 
-  @IsOptional({ always: true })
-  @IsString({ always: true })
-  @Column({ type: 'varchar', length: 256, nullable: true, default: null })
-  address: string;
-
-  @Column({ type: 'enum', enum: experienceEnum, default: 0 })
+  @ApiProperty({ example: '1' })
+  @IsOptional({ groups: [CREATE, UPDATE] })
+  @IsIn(enumToArray(Experience))
+  @Column({ type: 'enum', enum: Experience, nullable: true })
   experience: string;
-
-  // @IsOptional({ always: true })
-  // @Column({ type: 'date', length: 256, nullable: true, default: null })
-  // eduaction: Date;
-
   /** Relation to User */
 
   @OneToOne(

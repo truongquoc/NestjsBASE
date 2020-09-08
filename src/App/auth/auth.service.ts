@@ -45,21 +45,16 @@ export class AuthServices {
       const user: User = await this.validateUser(data);
       const payload: Payload = {
         id: user.id,
-        firstName: user.name.first,
-        lastName: user.name.last,
+        name: user.name,
         role: user.role.role,
       };
 
       return {
         token: await this.signPayload(payload),
         id: user.id,
-        name: {
-          first: user.name.first,
-          last: user.name.last,
-        },
+        name: user.name,
         email: user.email,
         gender: user.gender,
-        birthday: user.birthday,
         phone: user.phone,
         role: user.role.role,
       };
@@ -75,7 +70,6 @@ export class AuthServices {
     try {
       const data = this.userRepository.create({
         ...dto,
-        name: { first: dto.firstName, last: dto.lastName },
       });
       return await this.userRepository.save(data);
     } catch (error) {
